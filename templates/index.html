@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Hub</title>
+    <!-- Modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-database animate-pulse"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>BigQuery</h1>
+                    <span class="badge-sub">Release Pulse</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="last-updated" id="last-updated-text">Checking for updates...</span>
+                <button id="refresh-btn" class="btn btn-primary" title="Refresh Release Notes">
+                    <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Overview Row -->
+        <section class="stats-container">
+            <div class="stat-card" data-filter="all">
+                <div class="stat-icon all"><i class="fa-solid fa-list"></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-all-count">-</h3>
+                    <p>Total Updates</p>
+                </div>
+            </div>
+            <div class="stat-card" data-filter="Feature">
+                <div class="stat-icon feature"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-feature-count">-</h3>
+                    <p>Features</p>
+                </div>
+            </div>
+            <div class="stat-card" data-filter="Announcement">
+                <div class="stat-icon announcement"><i class="fa-solid fa-bullhorn"></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-announcement-count">-</h3>
+                    <p>Announcements</p>
+                </div>
+            </div>
+            <div class="stat-card" data-filter="Issue">
+                <div class="stat-icon issue"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div class="stat-info">
+                    <h3 id="stat-issue-count">-</h3>
+                    <p>Issues / Deprecations</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            
+            <!-- Controls & Filters Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-widget">
+                    <h3><i class="fa-solid fa-magnifying-glass"></i> Search Feed</h3>
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Search keywords or dates...">
+                        <i class="fa-solid fa-xmark clear-search-icon" id="clear-search"></i>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3><i class="fa-solid fa-filter"></i> Category Filter</h3>
+                    <div class="filter-pills" id="type-filters">
+                        <button class="filter-pill active" data-type="all">All Updates</button>
+                        <button class="filter-pill" data-type="Feature"><span class="dot feat"></span>Features</button>
+                        <button class="filter-pill" data-type="Announcement"><span class="dot ann"></span>Announcements</button>
+                        <button class="filter-pill" data-type="Issue"><span class="dot iss"></span>Issues</button>
+                        <button class="filter-pill" data-type="Deprecation"><span class="dot dep"></span>Deprecations</button>
+                        <button class="filter-pill" data-type="Update"><span class="dot upd"></span>General Updates</button>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h3><i class="fa-solid fa-sort"></i> Date Sorting</h3>
+                    <div class="sort-buttons">
+                        <button class="btn btn-outline active" id="sort-desc">
+                            <i class="fa-solid fa-arrow-down-short-wide"></i> Latest First
+                        </button>
+                        <button class="btn btn-outline" id="sort-asc">
+                            <i class="fa-solid fa-arrow-up-wide-short"></i> Oldest First
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Release Notes Stream -->
+            <section class="feed-section">
+                <!-- Loader State -->
+                <div class="feed-loader" id="feed-loader">
+                    <div class="glitch-spinner"></div>
+                    <p>Synchronizing with Google Cloud feed...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state hidden" id="empty-state">
+                    <i class="fa-solid fa-database-crack"></i>
+                    <h3>No matching updates found</h3>
+                    <p>Try refining your search terms or filters.</p>
+                </div>
+
+                <!-- Grid Stream -->
+                <div class="feed-grid hidden" id="feed-grid">
+                    <!-- Cards injected here via JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Twitter Composer Drawer (Premium Slide-Over) -->
+    <div class="composer-overlay" id="composer-overlay">
+        <div class="composer-drawer">
+            <div class="composer-header">
+                <h2><i class="fa-brands fa-x-twitter"></i> Tweet Composer</h2>
+                <button class="btn-close" id="close-composer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="composer-body">
+                <!-- Source Update Details -->
+                <div class="source-preview">
+                    <div class="preview-meta">
+                        <span class="preview-badge" id="preview-badge">Feature</span>
+                        <span class="preview-date" id="preview-date">June 17, 2026</span>
+                    </div>
+                    <p class="preview-text" id="preview-update-text">Autonomous embedding generation is now generally available (GA)...</p>
+                </div>
+
+                <!-- Interactive Edit Area -->
+                <div class="composer-editor">
+                    <label for="tweet-textarea">Compose your message:</label>
+                    <textarea id="tweet-textarea" rows="8" placeholder="What's happening?"></textarea>
+                    
+                    <div class="editor-footer">
+                        <!-- Hashtag Helpers -->
+                        <div class="hashtag-helpers">
+                            <span class="helper-tag" data-tag="#BigQuery">#BigQuery</span>
+                            <span class="helper-tag" data-tag="#GoogleCloud">#GoogleCloud</span>
+                            <span class="helper-tag" data-tag="#DataEngineering">#DataEng</span>
+                            <span class="helper-tag" data-tag="#AI">#AI</span>
+                        </div>
+                        
+                        <!-- Word/Char Counter -->
+                        <div class="char-counter" id="char-counter">0 / 280</div>
+                    </div>
+                </div>
+
+                <!-- Live Post Mockup -->
+                <div class="x-mockup">
+                    <div class="mockup-header">
+                        <div class="mockup-avatar">G</div>
+                        <div class="mockup-user">
+                            <span class="display-name">Cloud Architect</span>
+                            <span class="username">@cloud_architect</span>
+                        </div>
+                    </div>
+                    <p class="mockup-content" id="mockup-content">📢 Google Cloud #BigQuery Update...</p>
+                    <div class="mockup-footer">
+                        <span><i class="fa-regular fa-comment"></i> 0</span>
+                        <span><i class="fa-regular fa-retweet"></i> 0</span>
+                        <span><i class="fa-regular fa-heart"></i> 0</span>
+                        <span><i class="fa-regular fa-bookmark"></i> 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="composer-footer">
+                <button class="btn btn-secondary" id="reset-tweet-btn">Reset Text</button>
+                <button class="btn btn-tweet" id="share-tweet-btn">
+                    <i class="fa-brands fa-x-twitter"></i> Post to X
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-check-circle toast-icon" id="toast-icon"></i>
+        <span class="toast-message" id="toast-message">Updates successfully loaded!</span>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
